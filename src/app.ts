@@ -4,6 +4,7 @@ import mongoose from "mongoose";
 import dotenv from "dotenv";
 import { Request, Response, NextFunction } from "express";
 
+import { errorHandler } from "./middleware/error-handler";
 import authRouter from "./routes/auth";
 
 dotenv.config();
@@ -18,7 +19,9 @@ app.use((req: Request, res: Response, next: NextFunction) => {
   next();
 });
 
-app.use(authRouter);
+app.use("/auth", authRouter);
+
+app.use(errorHandler);
 
 const startServer = async () => {
   try {
