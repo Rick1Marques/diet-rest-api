@@ -12,29 +12,23 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-const express_1 = __importDefault(require("express"));
-const body_parser_1 = __importDefault(require("body-parser"));
-const mongoose_1 = __importDefault(require("mongoose"));
-const dotenv_1 = __importDefault(require("dotenv"));
-const auth_1 = __importDefault(require("./routes/auth"));
-dotenv_1.default.config();
-const app = (0, express_1.default)();
-app.use(body_parser_1.default.json());
-app.use((req, res, next) => {
-    res.setHeader("Acess-Control-Allow-Orign", "*");
-    res.setHeader("Acess-Control-Allow-Methods", "OPTIONS, GET, POST, PUT, PATCH, DELETE");
-    res.setHeader("Acess-Control-Allow-Headers", "Content-Type, Authorization");
-    next();
-});
-app.use(auth_1.default);
-const startServer = () => __awaiter(void 0, void 0, void 0, function* () {
+exports.postSignup = void 0;
+const user_1 = __importDefault(require("../models/user"));
+const bcrypt_1 = __importDefault(require("bcrypt"));
+const postSignup = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const dbURL = process.env.DATABASE_URL || "";
-        yield mongoose_1.default.connect(dbURL);
-        app.listen(3000);
+        const { name, email, password } = req.body;
+        let user = yield user_1.default.findOne({ email: email });
+        if (user) {
+            throw new Error('Email address is already in use!');
+        }
+        const hashedPassword = yield bcrypt_1.default.hash(password, 12);
+        user = new user_1.default({ name: name, email: email, password: hashedPassword });
+        yield user.save();
+        res.status(201).json({ message: "New user created!", user: user });
     }
     catch (error) {
         console.log(error);
     }
 });
-startServer();
+exports.postSignup = postSignup;
