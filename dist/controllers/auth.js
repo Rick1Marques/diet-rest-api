@@ -38,16 +38,11 @@ const postSignup = (req, res, next) => __awaiter(void 0, void 0, void 0, functio
 exports.postSignup = postSignup;
 const postLogin = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const { name, password } = req.body;
+        const { name } = req.body;
         const user = yield user_1.default.findOne({ name: name });
-        const doMatch = yield bcrypt_1.default.compare(password, user.password);
-        if (!doMatch) {
-            const error = new error_handling_1.CustomError('Password and/or name of user is/are wrong', 401);
-            throw error;
-        }
-        const token = jsonwebtoken_1.default.sign({ name: name,
-            userId: user._id.toString()
-        }, 'someLongSecretString', { expiresIn: '1h' });
+        const token = jsonwebtoken_1.default.sign({ name: name, userId: user._id.toString() }, "someLongSecretString", {
+            expiresIn: "1h",
+        });
         res.status(200).json({ token: token, userId: user._id.toString() });
     }
     catch (error) {
