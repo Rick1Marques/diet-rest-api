@@ -23,8 +23,8 @@ router.post(
       .isEmail()
       .withMessage("Email address must be valid")
       .custom(async (value, { req }) => {
-        const userEmail = await User.findOne({ email: value });
-        if (userEmail) {
+        const user = await User.findOne({ email: value });
+        if (user) {
           return Promise.reject("Email address is already in use");
         }
       }),
@@ -46,5 +46,7 @@ router.post(
   ],
   authControllers.postSignup
 );
+
+router.post("/login", authControllers.postLogin);
 
 export default router;

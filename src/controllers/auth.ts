@@ -3,6 +3,7 @@ import bcrypt from "bcrypt";
 import { Request, Response, NextFunction } from "express";
 import { validationResult } from "express-validator";
 import { CustomError } from "../util/error-handling";
+import jwt from 'jsonwebtoken'
 
 export const postSignup = async (req: Request, res: Response, next: NextFunction) => {
   try {
@@ -21,3 +22,26 @@ export const postSignup = async (req: Request, res: Response, next: NextFunction
     next(error);
   }
 };
+
+export const postLogin = async (req: Request, res: Response, next: NextFunction){
+  try {
+    const {name, password} = req.body
+    const user = await User.findOne({name: name})
+    const doMatch = await bcrypt.compare(password, user!.password)
+    if(!doMatch){
+      const error = new CustomError('Password and/or name of user is/are wrong', 401)
+      throw error
+    }
+    const token = jwt.sign(
+      {name: name,
+        userId: user!._id.toString()
+      },
+      'someLongSecretString',
+      {expiresIn: '1h'}
+    )
+    res.status(200).json({token:token, userId: user!._id.toString()})
+
+  } catch (error) {
+    next(error)
+  }
+}
