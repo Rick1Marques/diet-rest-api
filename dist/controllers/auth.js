@@ -15,20 +15,23 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.postSignup = void 0;
 const user_1 = __importDefault(require("../models/user"));
 const bcrypt_1 = __importDefault(require("bcrypt"));
+const express_validator_1 = require("express-validator");
+const error_handling_1 = require("../util/error-handling");
 const postSignup = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const { name, email, password } = req.body;
-        let user = yield user_1.default.findOne({ email: email });
-        if (user) {
-            throw new Error('Email address is already in use!');
+        const errors = (0, express_validator_1.validationResult)(req);
+        if (!errors.isEmpty()) {
+            const error = new error_handling_1.CustomError("Validation failed", 422, errors.array());
+            throw error;
         }
         const hashedPassword = yield bcrypt_1.default.hash(password, 12);
-        user = new user_1.default({ name: name, email: email, password: hashedPassword });
+        const user = new user_1.default({ name: name, email: email, password: hashedPassword });
         yield user.save();
         res.status(201).json({ message: "New user created!", user: user });
     }
     catch (error) {
-        console.log(error);
+        next(error);
     }
 });
 exports.postSignup = postSignup;

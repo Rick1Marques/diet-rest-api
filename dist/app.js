@@ -16,6 +16,7 @@ const express_1 = __importDefault(require("express"));
 const body_parser_1 = __importDefault(require("body-parser"));
 const mongoose_1 = __importDefault(require("mongoose"));
 const dotenv_1 = __importDefault(require("dotenv"));
+const error_handler_1 = require("./middleware/error-handler");
 const auth_1 = __importDefault(require("./routes/auth"));
 dotenv_1.default.config();
 const app = (0, express_1.default)();
@@ -26,7 +27,8 @@ app.use((req, res, next) => {
     res.setHeader("Acess-Control-Allow-Headers", "Content-Type, Authorization");
     next();
 });
-app.use(auth_1.default);
+app.use("/auth", auth_1.default);
+app.use(error_handler_1.errorHandler);
 const startServer = () => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const dbURL = process.env.DATABASE_URL || "";

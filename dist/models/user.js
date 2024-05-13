@@ -8,15 +8,17 @@ const mongoose_2 = require("mongoose");
 const userSchema = new mongoose_2.Schema({
     name: {
         type: String,
-        required: true
+        required: true,
+        unique: true,
     },
     email: {
         type: String,
-        required: true
+        required: true,
+        unique: true,
     },
     password: {
         type: String,
-        required: true
-    }
+        required: true,
+    },
 }, { timestamps: true });
-exports.default = mongoose_1.default.model('User', userSchema);
+exports.default = mongoose_1.default.model("User", userSchema);
