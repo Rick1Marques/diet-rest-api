@@ -9,6 +9,8 @@ router.post(
   "/signup",
   [
     check("name")
+      .notEmpty()
+      .withMessage("Name is required")
       .isAlphanumeric()
       .withMessage("Name must countain only alphanumeric characters")
       .custom(async (value, { req }) => {
@@ -19,11 +21,11 @@ router.post(
       }),
     check("email")
       .isEmail()
-      .withMessage("Email is already in use")
+      .withMessage("Email address must be valid")
       .custom(async (value, { req }) => {
         const userEmail = await User.findOne({ email: value });
         if (userEmail) {
-          return Promise.reject("Email exists already");
+          return Promise.reject("Email address is already in use");
         }
       }),
     check("password")
@@ -35,6 +37,12 @@ router.post(
       .withMessage("Password must contain at least one number")
       .matches(/[$&+,:;=?@#|'<>.^*()%!-]/)
       .withMessage("Password must contain at least one symbol"),
+    check("confirmPassword").custom((value, { req }) => {
+      if (value !== req.body.password) {
+        throw new Error("Password does not match");
+      }
+      return true;
+    }),
   ],
   authControllers.postSignup
 );
