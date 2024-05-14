@@ -39,6 +39,11 @@ exports.postSignup = postSignup;
 const postLogin = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const { name } = req.body;
+        const errors = (0, express_validator_1.validationResult)(req);
+        if (!errors.isEmpty()) {
+            const error = new error_handling_1.CustomError("Validation failed", 422, errors.array());
+            throw error;
+        }
         const user = yield user_1.default.findOne({ name: name });
         const token = jsonwebtoken_1.default.sign({ name: name, userId: user._id.toString() }, "someLongSecretString", {
             expiresIn: "1h",

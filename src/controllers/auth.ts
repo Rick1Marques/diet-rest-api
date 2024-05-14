@@ -26,6 +26,12 @@ export const postSignup = async (req: Request, res: Response, next: NextFunction
 export const postLogin = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const { name } = req.body;
+
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      const error = new CustomError("Validation failed", 422, errors.array());
+      throw error;
+    }
     const user = await User.findOne({ name: name });
     const token = jwt.sign({ name: name, userId: user!._id.toString() }, "someLongSecretString", {
       expiresIn: "1h",
