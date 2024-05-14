@@ -12,6 +12,11 @@ declare global {
 }
 
 export const isAuth = (req: Request, res: Response, next: NextFunction) => {
+  const authHeader = req.get("Authorization");
+  if (!authHeader) {
+    const error = new CustomError("Not authenticated", 401);
+    throw error;
+  }
   const token = req.get("Authorization")!.split(" ")[1];
   let decodedToken: JwtPayload;
   try {

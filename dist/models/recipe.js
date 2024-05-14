@@ -53,5 +53,10 @@ const recipeSchema = new mongoose_2.Schema({
         type: Number,
         required: true,
     },
-});
+    userId: {
+        type: mongoose_2.Schema.Types.ObjectId,
+        ref: "User",
+        required: true,
+    },
+}, { timestamps: true });
 exports.default = mongoose_1.default.model("Recipe", recipeSchema);
