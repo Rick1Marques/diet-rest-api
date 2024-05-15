@@ -47,3 +47,13 @@ export const getRecipes = async (req: Request, res: Response, next: NextFunction
     next(error);
   }
 };
+
+export const getRecipe = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const recipeId = req.params.recipeId;
+    const recipe = await Recipe.findById(recipeId);
+    res.status(200).json({ message: "Feteched recipe successfully", recipe: recipe });
+  } catch (error) {
+    next(error);
+  }
+};
