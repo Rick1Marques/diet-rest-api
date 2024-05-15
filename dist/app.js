@@ -18,6 +18,7 @@ const mongoose_1 = __importDefault(require("mongoose"));
 const dotenv_1 = __importDefault(require("dotenv"));
 const error_handler_1 = require("./middleware/error-handler");
 const auth_1 = __importDefault(require("./routes/auth"));
+const diet_1 = __importDefault(require("./routes/diet"));
 dotenv_1.default.config();
 const app = (0, express_1.default)();
 app.use(body_parser_1.default.json());
@@ -28,6 +29,7 @@ app.use((req, res, next) => {
     next();
 });
 app.use("/auth", auth_1.default);
+app.use("/diet", diet_1.default);
 app.use(error_handler_1.errorHandler);
 const startServer = () => __awaiter(void 0, void 0, void 0, function* () {
     try {
