@@ -1,5 +1,6 @@
 import { Request, Response, NextFunction } from "express";
 import Recipe from "../models/recipe";
+import { CustomError } from "../util/error-handling";
 
 export const postRecipe = async (req: Request, res: Response, next: NextFunction) => {
   try {
@@ -14,7 +15,13 @@ export const postRecipe = async (req: Request, res: Response, next: NextFunction
       preparationTime,
     } = req.body;
 
-    const recipe = new Recipe({
+    let recipe = await Recipe.findOne({ title: title });
+    if (recipe?.userId.toString() === req.userId) {
+      const error = new CustomError("User has already a recipe with this title", 422);
+      throw error;
+    }
+
+    recipe = new Recipe({
       title: title,
       category: category,
       ingredients: ingredients,
@@ -28,6 +35,6 @@ export const postRecipe = async (req: Request, res: Response, next: NextFunction
     await recipe.save();
     res.status(201).json({ message: "New recipe created!", recipe: recipe });
   } catch (error) {
-    console.log(error);
+    next(error);
   }
 };
