@@ -12,12 +12,18 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.postRecipe = void 0;
+exports.getRecipes = exports.postRecipe = void 0;
 const recipe_1 = __importDefault(require("../models/recipe"));
+const error_handling_1 = require("../util/error-handling");
 const postRecipe = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const { title, category, ingredients, vegetarian, vegan, nutrition, instructions, preparationTime, } = req.body;
-        const recipe = new recipe_1.default({
+        let recipe = yield recipe_1.default.findOne({ title: title });
+        if ((recipe === null || recipe === void 0 ? void 0 : recipe.userId.toString()) === req.userId) {
+            const error = new error_handling_1.CustomError("User has already a recipe with this title", 422);
+            throw error;
+        }
+        recipe = new recipe_1.default({
             title: title,
             category: category,
             ingredients: ingredients,
@@ -32,7 +38,17 @@ const postRecipe = (req, res, next) => __awaiter(void 0, void 0, void 0, functio
         res.status(201).json({ message: "New recipe created!", recipe: recipe });
     }
     catch (error) {
-        console.log(error);
+        next(error);
     }
 });
 exports.postRecipe = postRecipe;
+const getRecipes = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const recipes = yield recipe_1.default.find();
+        res.status(200).json({ message: "Feteched recipes successfully", recipes: recipes });
+    }
+    catch (error) {
+        next(error);
+    }
+});
+exports.getRecipes = getRecipes;
