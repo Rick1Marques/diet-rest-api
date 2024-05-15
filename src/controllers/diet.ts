@@ -94,3 +94,18 @@ export const putRecipe = async (req: Request, res: Response, next: NextFunction)
     next(error);
   }
 };
+
+export const deleteRecipe = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const recipeId = req.params.recipeId;
+    let recipe = await Recipe.findById(recipeId);
+    if (recipe?.userId.toString() !== req.userId) {
+      const error = new CustomError("Not authorized", 403);
+      throw error;
+    }
+    await Recipe.findByIdAndDelete(recipeId);
+    res.status(200).json({ message: "Recipe deleted" });
+  } catch (error) {
+    next(error);
+  }
+};

@@ -12,7 +12,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.putRecipe = exports.getRecipe = exports.getRecipes = exports.postRecipe = void 0;
+exports.deleteRecipe = exports.putRecipe = exports.getRecipe = exports.getRecipes = exports.postRecipe = void 0;
 const recipe_1 = __importDefault(require("../models/recipe"));
 const error_handling_1 = require("../util/error-handling");
 const postRecipe = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
@@ -88,3 +88,19 @@ const putRecipe = (req, res, next) => __awaiter(void 0, void 0, void 0, function
     }
 });
 exports.putRecipe = putRecipe;
+const deleteRecipe = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const recipeId = req.params.recipeId;
+        let recipe = yield recipe_1.default.findById(recipeId);
+        if ((recipe === null || recipe === void 0 ? void 0 : recipe.userId.toString()) !== req.userId) {
+            const error = new error_handling_1.CustomError("Not authorized", 403);
+            throw error;
+        }
+        yield recipe_1.default.findByIdAndDelete(recipeId);
+        res.status(200).json({ message: "Recipe deleted" });
+    }
+    catch (error) {
+        next(error);
+    }
+});
+exports.deleteRecipe = deleteRecipe;

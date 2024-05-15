@@ -31,4 +31,5 @@ router.post("/recipe", is_auth_1.isAuth, dietControllers.postRecipe);
 router.get("/recipes", is_auth_1.isAuth, dietControllers.getRecipes);
 router.get("/recipes/:recipeId", is_auth_1.isAuth, dietControllers.getRecipe);
 router.put("/recipes/:recipeId", is_auth_1.isAuth, dietControllers.putRecipe);
+router.delete("/recipes/:recipeId", is_auth_1.isAuth, dietControllers.deleteRecipe);
 exports.default = router;
