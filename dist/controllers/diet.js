@@ -12,7 +12,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.getRecipe = exports.getRecipes = exports.postRecipe = void 0;
+exports.putRecipe = exports.getRecipe = exports.getRecipes = exports.postRecipe = void 0;
 const recipe_1 = __importDefault(require("../models/recipe"));
 const error_handling_1 = require("../util/error-handling");
 const postRecipe = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
@@ -63,3 +63,28 @@ const getRecipe = (req, res, next) => __awaiter(void 0, void 0, void 0, function
     }
 });
 exports.getRecipe = getRecipe;
+const putRecipe = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const { title, category, ingredients, vegetarian, vegan, nutrition, instructions, preparationTime, } = req.body;
+        const recipeId = req.params.recipeId;
+        let recipe = yield recipe_1.default.findById(recipeId);
+        if ((recipe === null || recipe === void 0 ? void 0 : recipe.userId.toString()) !== req.userId) {
+            const error = new error_handling_1.CustomError("Not authorized", 403);
+            throw error;
+        }
+        (recipe.title = title),
+            (recipe.category = category),
+            (recipe.ingredients = ingredients),
+            (recipe.vegetarian = vegetarian),
+            (recipe.vegan = vegan),
+            (recipe.nutrition = nutrition),
+            (recipe.instructions = instructions),
+            (recipe.preparationTime = preparationTime),
+            recipe.save();
+        res.status(200).json({ message: "Recipe updated", recipe: recipe });
+    }
+    catch (error) {
+        next(error);
+    }
+});
+exports.putRecipe = putRecipe;

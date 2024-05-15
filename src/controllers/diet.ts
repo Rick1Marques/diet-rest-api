@@ -57,3 +57,40 @@ export const getRecipe = async (req: Request, res: Response, next: NextFunction)
     next(error);
   }
 };
+
+export const putRecipe = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const {
+      title,
+      category,
+      ingredients,
+      vegetarian,
+      vegan,
+      nutrition,
+      instructions,
+      preparationTime,
+    } = req.body;
+
+    const recipeId = req.params.recipeId;
+    let recipe = await Recipe.findById(recipeId);
+
+    if (recipe?.userId.toString() !== req.userId) {
+      const error = new CustomError("Not authorized", 403);
+      throw error;
+    }
+
+    (recipe!.title = title),
+      (recipe!.category = category),
+      (recipe!.ingredients = ingredients),
+      (recipe!.vegetarian = vegetarian),
+      (recipe!.vegan = vegan),
+      (recipe!.nutrition = nutrition),
+      (recipe!.instructions = instructions),
+      (recipe!.preparationTime = preparationTime),
+      recipe!.save();
+
+    res.status(200).json({ message: "Recipe updated", recipe: recipe });
+  } catch (error) {
+    next(error);
+  }
+};
