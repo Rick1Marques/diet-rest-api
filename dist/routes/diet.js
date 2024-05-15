@@ -28,4 +28,5 @@ const dietControllers = __importStar(require("../controllers/diet"));
 const is_auth_1 = require("../middleware/is-auth");
 const router = (0, express_1.Router)();
 router.post("/recipe", is_auth_1.isAuth, dietControllers.postRecipe);
+router.get("/recipes", is_auth_1.isAuth, dietControllers.getRecipes);
 exports.default = router;

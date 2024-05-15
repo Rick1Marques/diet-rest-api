@@ -6,4 +6,6 @@ const router = Router();
 
 router.post("/recipe", isAuth, dietControllers.postRecipe);
 
+router.get("/recipes", isAuth, dietControllers.getRecipes);
+
 export default router;
