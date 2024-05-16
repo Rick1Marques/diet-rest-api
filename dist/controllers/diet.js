@@ -56,6 +56,10 @@ const getRecipe = (req, res, next) => __awaiter(void 0, void 0, void 0, function
     try {
         const recipeId = req.params.recipeId;
         const recipe = yield recipe_1.default.findById(recipeId);
+        if (!recipe) {
+            const error = new error_handling_1.CustomError("No recipe found", 422);
+            throw error;
+        }
         res.status(200).json({ message: "Feteched recipe successfully", recipe: recipe });
     }
     catch (error) {
