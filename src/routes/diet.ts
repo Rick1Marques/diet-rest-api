@@ -14,4 +14,6 @@ router.put("/recipes/:recipeId", isAuth, dietControllers.putRecipe);
 
 router.delete("/recipes/:recipeId", isAuth, dietControllers.deleteRecipe);
 
+router.get("/recipes/user/:userId", isAuth, dietControllers.getRecipesFromUser);
+
 export default router;

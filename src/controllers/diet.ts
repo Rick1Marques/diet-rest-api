@@ -109,3 +109,17 @@ export const deleteRecipe = async (req: Request, res: Response, next: NextFuncti
     next(error);
   }
 };
+
+export const getRecipesFromUser = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const userId = req.params.userId;
+    const recipes = await Recipe.find({ userId: userId });
+    if (recipes.length === 0) {
+      const error = new CustomError("No recipes found from this user", 422);
+      throw error;
+    }
+    res.status(200).json({ message: "Feteched recipes successfully", recipes: recipes });
+  } catch (error) {
+    next(error);
+  }
+};

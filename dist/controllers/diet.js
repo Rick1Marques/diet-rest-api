@@ -12,7 +12,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.deleteRecipe = exports.putRecipe = exports.getRecipe = exports.getRecipes = exports.postRecipe = void 0;
+exports.getRecipesFromUser = exports.deleteRecipe = exports.putRecipe = exports.getRecipe = exports.getRecipes = exports.postRecipe = void 0;
 const recipe_1 = __importDefault(require("../models/recipe"));
 const error_handling_1 = require("../util/error-handling");
 const postRecipe = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
@@ -104,3 +104,18 @@ const deleteRecipe = (req, res, next) => __awaiter(void 0, void 0, void 0, funct
     }
 });
 exports.deleteRecipe = deleteRecipe;
+const getRecipesFromUser = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const userId = req.params.userId;
+        const recipes = yield recipe_1.default.find({ userId: userId });
+        if (recipes.length === 0) {
+            const error = new error_handling_1.CustomError("No recipes found from this user", 422);
+            throw error;
+        }
+        res.status(200).json({ message: "Feteched recipes successfully", recipes: recipes });
+    }
+    catch (error) {
+        next(error);
+    }
+});
+exports.getRecipesFromUser = getRecipesFromUser;
