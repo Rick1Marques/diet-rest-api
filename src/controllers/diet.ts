@@ -41,7 +41,27 @@ export const postRecipe = async (req: Request, res: Response, next: NextFunction
 
 export const getRecipes = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const recipes = await Recipe.find();
+    let query = Recipe.find();
+
+    if (req.query.title) {
+      query = query.where("title").equals(req.query.title);
+    }
+    if (req.query.category) {
+      query = query.where("category").equals(req.query.category);
+    }
+    if (req.query.vegetarian) {
+      query = query.where("vegetarian").equals(req.query.vegetarian);
+    }
+    if (req.query.vegan) {
+      query = query.where("vegan").equals(req.query.vegan);
+    }
+
+    const recipes = await query;
+
+    if (recipes.length === 0) {
+      const error = new CustomError("No recipes found", 422);
+      throw error;
+    }
     res.status(200).json({ message: "Feteched recipes successfully", recipes: recipes });
   } catch (error) {
     next(error);

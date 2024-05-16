@@ -44,7 +44,24 @@ const postRecipe = (req, res, next) => __awaiter(void 0, void 0, void 0, functio
 exports.postRecipe = postRecipe;
 const getRecipes = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const recipes = yield recipe_1.default.find();
+        let query = recipe_1.default.find();
+        if (req.query.title) {
+            query = query.where("title").equals(req.query.title);
+        }
+        if (req.query.category) {
+            query = query.where("category").equals(req.query.category);
+        }
+        if (req.query.vegetarian) {
+            query = query.where("vegetarian").equals(req.query.vegetarian);
+        }
+        if (req.query.vegan) {
+            query = query.where("vegan").equals(req.query.vegan);
+        }
+        const recipes = yield query;
+        if (recipes.length === 0) {
+            const error = new error_handling_1.CustomError("No recipes found", 422);
+            throw error;
+        }
         res.status(200).json({ message: "Feteched recipes successfully", recipes: recipes });
     }
     catch (error) {
