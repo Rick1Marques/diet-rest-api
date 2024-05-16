@@ -41,27 +41,37 @@ export const postRecipe = async (req: Request, res: Response, next: NextFunction
 
 export const getRecipes = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    let query = Recipe.find();
+    let query: any = {};
 
     if (req.query.title) {
-      query = query.where("title").equals(req.query.title);
+      query.title = req.query.title;
     }
     if (req.query.category) {
-      query = query.where("category").equals(req.query.category);
+      query.category = req.query.category;
     }
     if (req.query.vegetarian) {
-      query = query.where("vegetarian").equals(req.query.vegetarian);
+      query.vegetarian = req.query.vegetarian;
     }
     if (req.query.vegan) {
-      query = query.where("vegan").equals(req.query.vegan);
+      query.vegan = req.query.vegan;
+    }
+    if (req.query.minCalories) {
+      query["nutrition.calories"] = { $gte: +req.query.minCalories };
+    }
+    if (req.query.maxCalories) {
+      query["nutrition.calories"] = { $lte: +req.query.maxCalories };
+    }
+    if (req.query.maxPreparationTime) {
+      query.preparationTime = { $lte: +req.query.maxPreparationTime };
     }
 
-    const recipes = await query;
+    const recipes = await Recipe.find(query);
 
     if (recipes.length === 0) {
       const error = new CustomError("No recipes found", 422);
       throw error;
     }
+
     res.status(200).json({ message: "Feteched recipes successfully", recipes: recipes });
   } catch (error) {
     next(error);
