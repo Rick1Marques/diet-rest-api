@@ -50,6 +50,10 @@ const recipeSchema = new Schema(
       type: Number,
       required: true,
     },
+    servings: {
+      type: Number,
+      required: true,
+    },
     userId: {
       type: Schema.Types.ObjectId,
       ref: "User",

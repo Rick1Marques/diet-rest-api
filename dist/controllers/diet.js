@@ -12,7 +12,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.getRecipes = exports.postRecipe = void 0;
+exports.getRecipesFromUser = exports.deleteRecipe = exports.putRecipe = exports.getRecipe = exports.getRecipes = exports.postRecipe = void 0;
 const recipe_1 = __importDefault(require("../models/recipe"));
 const error_handling_1 = require("../util/error-handling");
 const postRecipe = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
@@ -44,7 +44,49 @@ const postRecipe = (req, res, next) => __awaiter(void 0, void 0, void 0, functio
 exports.postRecipe = postRecipe;
 const getRecipes = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const recipes = yield recipe_1.default.find();
+        let query = {};
+        if (req.query.title) {
+            query.title = req.query.title;
+        }
+        if (req.query.category) {
+            query.category = req.query.category;
+        }
+        if (req.query.vegetarian) {
+            query.vegetarian = req.query.vegetarian;
+        }
+        if (req.query.vegan) {
+            query.vegan = req.query.vegan;
+        }
+        if (req.query.minCalories) {
+            query["nutrition.calories"] = { $gte: +req.query.minCalories };
+        }
+        if (req.query.maxCalories) {
+            query["nutrition.calories"] = { $lte: +req.query.maxCalories };
+        }
+        if (req.query.maxPreparationTime) {
+            query.preparationTime = { $lte: +req.query.maxPreparationTime };
+        }
+        if (req.query.includeIngredients) {
+            const includeIngredients = req.query.includeIngredients.split(",");
+            query["ingredients.name"] = { $in: includeIngredients };
+        }
+        if (req.query.excludeIngredients) {
+            const excludeIngredients = req.query.excludeIngredients.split(",");
+            query["ingredients.name"] = { $nin: excludeIngredients };
+        }
+        let sortField = req.query.sort || "title";
+        if (sortField === "calories" ||
+            sortField === "carbohydrate" ||
+            sortField === "protein" ||
+            sortField === "fat") {
+            sortField = `nutrition.${sortField}`;
+        }
+        let sortOrder = req.query.order === "desc" ? -1 : 1;
+        const recipes = yield recipe_1.default.find(query).sort({ [sortField]: sortOrder });
+        if (recipes.length === 0) {
+            const error = new error_handling_1.CustomError("No recipes found", 422);
+            throw error;
+        }
         res.status(200).json({ message: "Feteched recipes successfully", recipes: recipes });
     }
     catch (error) {
@@ -52,3 +94,74 @@ const getRecipes = (req, res, next) => __awaiter(void 0, void 0, void 0, functio
     }
 });
 exports.getRecipes = getRecipes;
+const getRecipe = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const recipeId = req.params.recipeId;
+        const recipe = yield recipe_1.default.findById(recipeId);
+        if (!recipe) {
+            const error = new error_handling_1.CustomError("No recipe found", 422);
+            throw error;
+        }
+        res.status(200).json({ message: "Feteched recipe successfully", recipe: recipe });
+    }
+    catch (error) {
+        next(error);
+    }
+});
+exports.getRecipe = getRecipe;
+const putRecipe = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const { title, category, ingredients, vegetarian, vegan, nutrition, instructions, preparationTime, } = req.body;
+        const recipeId = req.params.recipeId;
+        let recipe = yield recipe_1.default.findById(recipeId);
+        if ((recipe === null || recipe === void 0 ? void 0 : recipe.userId.toString()) !== req.userId) {
+            const error = new error_handling_1.CustomError("Not authorized", 403);
+            throw error;
+        }
+        (recipe.title = title),
+            (recipe.category = category),
+            (recipe.ingredients = ingredients),
+            (recipe.vegetarian = vegetarian),
+            (recipe.vegan = vegan),
+            (recipe.nutrition = nutrition),
+            (recipe.instructions = instructions),
+            (recipe.preparationTime = preparationTime),
+            recipe.save();
+        res.status(200).json({ message: "Recipe updated", recipe: recipe });
+    }
+    catch (error) {
+        next(error);
+    }
+});
+exports.putRecipe = putRecipe;
+const deleteRecipe = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const recipeId = req.params.recipeId;
+        let recipe = yield recipe_1.default.findById(recipeId);
+        if ((recipe === null || recipe === void 0 ? void 0 : recipe.userId.toString()) !== req.userId) {
+            const error = new error_handling_1.CustomError("Not authorized", 403);
+            throw error;
+        }
+        yield recipe_1.default.findByIdAndDelete(recipeId);
+        res.status(200).json({ message: "Recipe deleted" });
+    }
+    catch (error) {
+        next(error);
+    }
+});
+exports.deleteRecipe = deleteRecipe;
+const getRecipesFromUser = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const userId = req.params.userId;
+        const recipes = yield recipe_1.default.find({ userId: userId });
+        if (recipes.length === 0) {
+            const error = new error_handling_1.CustomError("No recipes found from this user", 422);
+            throw error;
+        }
+        res.status(200).json({ message: "Feteched recipes successfully", recipes: recipes });
+    }
+    catch (error) {
+        next(error);
+    }
+});
+exports.getRecipesFromUser = getRecipesFromUser;
