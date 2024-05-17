@@ -53,6 +53,10 @@ const recipeSchema = new mongoose_2.Schema({
         type: Number,
         required: true,
     },
+    servings: {
+        type: Number,
+        required: true,
+    },
     userId: {
         type: mongoose_2.Schema.Types.ObjectId,
         ref: "User",

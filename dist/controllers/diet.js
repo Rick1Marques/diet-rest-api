@@ -66,7 +66,23 @@ const getRecipes = (req, res, next) => __awaiter(void 0, void 0, void 0, functio
         if (req.query.maxPreparationTime) {
             query.preparationTime = { $lte: +req.query.maxPreparationTime };
         }
-        const recipes = yield recipe_1.default.find(query);
+        if (req.query.includeIngredients) {
+            const includeIngredients = req.query.includeIngredients.split(",");
+            query["ingredients.name"] = { $in: includeIngredients };
+        }
+        if (req.query.excludeIngredients) {
+            const excludeIngredients = req.query.excludeIngredients.split(",");
+            query["ingredients.name"] = { $nin: excludeIngredients };
+        }
+        let sortField = req.query.sort || "title";
+        if (sortField === "calories" ||
+            sortField === "carbohydrate" ||
+            sortField === "protein" ||
+            sortField === "fat") {
+            sortField = `nutrition.${sortField}`;
+        }
+        let sortOrder = req.query.order === "desc" ? -1 : 1;
+        const recipes = yield recipe_1.default.find(query).sort({ [sortField]: sortOrder });
         if (recipes.length === 0) {
             const error = new error_handling_1.CustomError("No recipes found", 422);
             throw error;

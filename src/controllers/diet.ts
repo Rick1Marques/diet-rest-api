@@ -64,8 +64,28 @@ export const getRecipes = async (req: Request, res: Response, next: NextFunction
     if (req.query.maxPreparationTime) {
       query.preparationTime = { $lte: +req.query.maxPreparationTime };
     }
+    if (req.query.includeIngredients) {
+      const includeIngredients = (req.query.includeIngredients as string).split(",");
+      query["ingredients.name"] = { $in: includeIngredients };
+    }
+    if (req.query.excludeIngredients) {
+      const excludeIngredients = (req.query.excludeIngredients as string).split(",");
+      query["ingredients.name"] = { $nin: excludeIngredients };
+    }
 
-    const recipes = await Recipe.find(query);
+    let sortField = (req.query.sort as string) || "title";
+    if (
+      sortField === "calories" ||
+      sortField === "carbohydrate" ||
+      sortField === "protein" ||
+      sortField === "fat"
+    ) {
+      sortField = `nutrition.${sortField}`;
+    }
+
+    let sortOrder: 1 | -1 = req.query.order === "desc" ? -1 : 1;
+
+    const recipes = await Recipe.find(query).sort({ [sortField]: sortOrder });
 
     if (recipes.length === 0) {
       const error = new CustomError("No recipes found", 422);
