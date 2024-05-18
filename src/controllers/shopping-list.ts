@@ -55,3 +55,13 @@ export const getShoppingList = async (req: Request, res: Response, next: NextFun
     next(error);
   }
 };
+
+export const deleteShoppingList = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const shoppingListId = req.params.shoppingListId;
+    await ShoppingList.findByIdAndDelete(shoppingListId);
+    res.status(200).json({ message: "Shopping list deleted" });
+  } catch (error) {
+    next(error);
+  }
+};

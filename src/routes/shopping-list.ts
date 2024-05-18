@@ -10,4 +10,6 @@ router.get("/shopping-lists", isAuth, shoppingListControllers.getShoppingLists);
 
 router.get("/shopping-lists/:shoppingListId", isAuth, shoppingListControllers.getShoppingList);
 
+router.delete("/shopping-list/:shoppingListId", isAuth, shoppingListControllers.deleteShoppingList);
+
 export default router;
