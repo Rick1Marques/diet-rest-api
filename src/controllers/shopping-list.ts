@@ -36,7 +36,21 @@ export const getShoppingLists = async (req: Request, res: Response, next: NextFu
     }
     res
       .status(200)
-      .json({ message: "Feteched shopping lists successfully", shoppingLists: shoppingLists });
+      .json({ message: "Fetched shopping lists successfully", shoppingLists: shoppingLists });
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const getShoppingList = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const shoppingListId = req.params.shoppingListId;
+    const shoppingList = await ShoppingList.findById(shoppingListId);
+    if (!shoppingList) {
+      const error = new CustomError("No shopping list found", 422);
+      throw error;
+    }
+    res.status(200).json({ message: "Fetched shopping list" });
   } catch (error) {
     next(error);
   }
