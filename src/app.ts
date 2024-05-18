@@ -7,6 +7,7 @@ import { Request, Response, NextFunction } from "express";
 import { errorHandler } from "./middleware/error-handler";
 import authRouter from "./routes/auth";
 import dietRouter from "./routes/diet";
+import shoppingListRouter from "./routes/shopping-list";
 
 dotenv.config();
 
@@ -22,6 +23,7 @@ app.use((req: Request, res: Response, next: NextFunction) => {
 
 app.use("/auth", authRouter);
 app.use("/diet", dietRouter);
+app.use("/shopping-list", shoppingListRouter);
 app.use(errorHandler);
 
 const startServer = async () => {
