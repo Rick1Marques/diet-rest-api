@@ -10,7 +10,7 @@ export const postRecipe = async (req: Request, res: Response, next: NextFunction
       ingredients,
       vegetarian,
       vegan,
-      nutrition,
+      nutritionPerServing,
       instructions,
       preparationTime,
     } = req.body;
@@ -27,7 +27,7 @@ export const postRecipe = async (req: Request, res: Response, next: NextFunction
       ingredients: ingredients,
       vegetarian: vegetarian,
       vegan: vegan,
-      nutrition: nutrition,
+      nutritionPerServing: nutritionPerServing,
       instructions: instructions,
       preparationTime: preparationTime,
       userId: req.userId,
@@ -56,10 +56,10 @@ export const getRecipes = async (req: Request, res: Response, next: NextFunction
       query.vegan = req.query.vegan;
     }
     if (req.query.minCalories) {
-      query["nutrition.calories"] = { $gte: +req.query.minCalories };
+      query["nutritionPerServing.calories"] = { $gte: +req.query.minCalories };
     }
     if (req.query.maxCalories) {
-      query["nutrition.calories"] = { $lte: +req.query.maxCalories };
+      query["nutritionPerServing.calories"] = { $lte: +req.query.maxCalories };
     }
     if (req.query.maxPreparationTime) {
       query.preparationTime = { $lte: +req.query.maxPreparationTime };
@@ -80,7 +80,7 @@ export const getRecipes = async (req: Request, res: Response, next: NextFunction
       sortField === "protein" ||
       sortField === "fat"
     ) {
-      sortField = `nutrition.${sortField}`;
+      sortField = `nutritionPerServing.${sortField}`;
     }
 
     let sortOrder: 1 | -1 = req.query.order === "desc" ? -1 : 1;
@@ -120,7 +120,7 @@ export const putRecipe = async (req: Request, res: Response, next: NextFunction)
       ingredients,
       vegetarian,
       vegan,
-      nutrition,
+      nutritionPerServing,
       instructions,
       preparationTime,
     } = req.body;
@@ -138,7 +138,7 @@ export const putRecipe = async (req: Request, res: Response, next: NextFunction)
       (recipe!.ingredients = ingredients),
       (recipe!.vegetarian = vegetarian),
       (recipe!.vegan = vegan),
-      (recipe!.nutrition = nutrition),
+      (recipe!.nutritionPerServing = nutritionPerServing),
       (recipe!.instructions = instructions),
       (recipe!.preparationTime = preparationTime),
       recipe!.save();

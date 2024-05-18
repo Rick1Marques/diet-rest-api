@@ -24,7 +24,7 @@ const recipeSchema = new Schema(
     vegan: {
       type: Boolean,
     },
-    nutrition: {
+    nutritionPerServing: {
       calories: {
         type: Number,
         required: true,
