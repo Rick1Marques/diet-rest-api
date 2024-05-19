@@ -86,8 +86,10 @@ const patchRecipeIntoShoppingList = (req, res, next) => __awaiter(void 0, void 0
         const recipe = yield recipe_1.default.findById(recipeId);
         const shoppingList = yield shopping_list_1.default.findById(shoppingListId);
         recipe.ingredients.forEach((recipeIngredient) => {
-            const existingIngredient = shoppingList === null || shoppingList === void 0 ? void 0 : shoppingList.ingredients.find((shoppingIngredient) => shoppingIngredient.name === recipeIngredient.name &&
-                shoppingIngredient.unit === recipeIngredient.unit);
+            const existingIngredient = shoppingList === null || shoppingList === void 0 ? void 0 : shoppingList.ingredients.find((shoppingIngredient) => shoppingIngredient.name.trim().toLowerCase() ===
+                recipeIngredient.name.trim().toLowerCase() &&
+                shoppingIngredient.unit.trim().toLowerCase() ===
+                    recipeIngredient.unit.trim().toLowerCase());
             if (existingIngredient) {
                 existingIngredient.quantity += recipeIngredient.quantity;
             }
@@ -99,6 +101,7 @@ const patchRecipeIntoShoppingList = (req, res, next) => __awaiter(void 0, void 0
                 });
             }
         });
+        shoppingList === null || shoppingList === void 0 ? void 0 : shoppingList.ingredients.sort((a, b) => a.name.localeCompare(b.name));
         yield shoppingList.save();
         res.status(200).json({ message: "Shopping list was updated", shoppingList: shoppingList });
     }

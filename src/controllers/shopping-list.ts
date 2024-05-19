@@ -82,8 +82,10 @@ export const patchRecipeIntoShoppingList = async (
     recipe!.ingredients.forEach((recipeIngredient) => {
       const existingIngredient = shoppingList?.ingredients.find(
         (shoppingIngredient) =>
-          shoppingIngredient.name === recipeIngredient.name &&
-          shoppingIngredient.unit === recipeIngredient.unit
+          shoppingIngredient.name.trim().toLowerCase() ===
+            recipeIngredient.name.trim().toLowerCase() &&
+          shoppingIngredient.unit.trim().toLowerCase() ===
+            recipeIngredient.unit.trim().toLowerCase()
       );
 
       if (existingIngredient) {
@@ -96,7 +98,7 @@ export const patchRecipeIntoShoppingList = async (
         });
       }
     });
-
+    shoppingList?.ingredients.sort((a, b) => a.name.localeCompare(b.name));
     await shoppingList!.save();
     res.status(200).json({ message: "Shopping list was updated", shoppingList: shoppingList });
   } catch (error) {
