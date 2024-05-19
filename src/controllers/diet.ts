@@ -10,9 +10,10 @@ export const postRecipe = async (req: Request, res: Response, next: NextFunction
       ingredients,
       vegetarian,
       vegan,
-      nutrition,
+      nutritionPerServing,
       instructions,
       preparationTime,
+      servings,
     } = req.body;
 
     let recipe = await Recipe.findOne({ title: title });
@@ -27,9 +28,10 @@ export const postRecipe = async (req: Request, res: Response, next: NextFunction
       ingredients: ingredients,
       vegetarian: vegetarian,
       vegan: vegan,
-      nutrition: nutrition,
+      nutritionPerServing: nutritionPerServing,
       instructions: instructions,
       preparationTime: preparationTime,
+      servings: servings,
       userId: req.userId,
     });
     await recipe.save();
@@ -56,10 +58,10 @@ export const getRecipes = async (req: Request, res: Response, next: NextFunction
       query.vegan = req.query.vegan;
     }
     if (req.query.minCalories) {
-      query["nutrition.calories"] = { $gte: +req.query.minCalories };
+      query["nutritionPerServing.calories"] = { $gte: +req.query.minCalories };
     }
     if (req.query.maxCalories) {
-      query["nutrition.calories"] = { $lte: +req.query.maxCalories };
+      query["nutritionPerServing.calories"] = { $lte: +req.query.maxCalories };
     }
     if (req.query.maxPreparationTime) {
       query.preparationTime = { $lte: +req.query.maxPreparationTime };
@@ -80,7 +82,7 @@ export const getRecipes = async (req: Request, res: Response, next: NextFunction
       sortField === "protein" ||
       sortField === "fat"
     ) {
-      sortField = `nutrition.${sortField}`;
+      sortField = `nutritionPerServing.${sortField}`;
     }
 
     let sortOrder: 1 | -1 = req.query.order === "desc" ? -1 : 1;
@@ -92,7 +94,7 @@ export const getRecipes = async (req: Request, res: Response, next: NextFunction
       throw error;
     }
 
-    res.status(200).json({ message: "Feteched recipes successfully", recipes: recipes });
+    res.status(200).json({ message: "Fetched recipes successfully", recipes: recipes });
   } catch (error) {
     next(error);
   }
@@ -106,7 +108,7 @@ export const getRecipe = async (req: Request, res: Response, next: NextFunction)
       const error = new CustomError("No recipe found", 422);
       throw error;
     }
-    res.status(200).json({ message: "Feteched recipe successfully", recipe: recipe });
+    res.status(200).json({ message: "Fetched recipe successfully", recipe: recipe });
   } catch (error) {
     next(error);
   }
@@ -120,9 +122,10 @@ export const putRecipe = async (req: Request, res: Response, next: NextFunction)
       ingredients,
       vegetarian,
       vegan,
-      nutrition,
+      nutritionPerServing,
       instructions,
       preparationTime,
+      servings,
     } = req.body;
 
     const recipeId = req.params.recipeId;
@@ -138,10 +141,11 @@ export const putRecipe = async (req: Request, res: Response, next: NextFunction)
       (recipe!.ingredients = ingredients),
       (recipe!.vegetarian = vegetarian),
       (recipe!.vegan = vegan),
-      (recipe!.nutrition = nutrition),
+      (recipe!.nutritionPerServing = nutritionPerServing),
       (recipe!.instructions = instructions),
       (recipe!.preparationTime = preparationTime),
-      recipe!.save();
+      (recipe!.servings = servings);
+    recipe!.save();
 
     res.status(200).json({ message: "Recipe updated", recipe: recipe });
   } catch (error) {
@@ -172,7 +176,7 @@ export const getRecipesFromUser = async (req: Request, res: Response, next: Next
       const error = new CustomError("No recipes found from this user", 422);
       throw error;
     }
-    res.status(200).json({ message: "Feteched recipes successfully", recipes: recipes });
+    res.status(200).json({ message: "Fetched recipes successfully", recipes: recipes });
   } catch (error) {
     next(error);
   }

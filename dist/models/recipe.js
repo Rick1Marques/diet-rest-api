@@ -27,7 +27,7 @@ const recipeSchema = new mongoose_2.Schema({
     vegan: {
         type: Boolean,
     },
-    nutrition: {
+    nutritionPerServing: {
         calories: {
             type: Number,
             required: true,
