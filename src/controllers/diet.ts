@@ -13,6 +13,7 @@ export const postRecipe = async (req: Request, res: Response, next: NextFunction
       nutritionPerServing,
       instructions,
       preparationTime,
+      servings,
     } = req.body;
 
     let recipe = await Recipe.findOne({ title: title });
@@ -30,6 +31,7 @@ export const postRecipe = async (req: Request, res: Response, next: NextFunction
       nutritionPerServing: nutritionPerServing,
       instructions: instructions,
       preparationTime: preparationTime,
+      servings: servings,
       userId: req.userId,
     });
     await recipe.save();
@@ -92,7 +94,7 @@ export const getRecipes = async (req: Request, res: Response, next: NextFunction
       throw error;
     }
 
-    res.status(200).json({ message: "Feteched recipes successfully", recipes: recipes });
+    res.status(200).json({ message: "Fetched recipes successfully", recipes: recipes });
   } catch (error) {
     next(error);
   }
@@ -106,7 +108,7 @@ export const getRecipe = async (req: Request, res: Response, next: NextFunction)
       const error = new CustomError("No recipe found", 422);
       throw error;
     }
-    res.status(200).json({ message: "Feteched recipe successfully", recipe: recipe });
+    res.status(200).json({ message: "Fetched recipe successfully", recipe: recipe });
   } catch (error) {
     next(error);
   }
@@ -123,6 +125,7 @@ export const putRecipe = async (req: Request, res: Response, next: NextFunction)
       nutritionPerServing,
       instructions,
       preparationTime,
+      servings,
     } = req.body;
 
     const recipeId = req.params.recipeId;
@@ -141,7 +144,8 @@ export const putRecipe = async (req: Request, res: Response, next: NextFunction)
       (recipe!.nutritionPerServing = nutritionPerServing),
       (recipe!.instructions = instructions),
       (recipe!.preparationTime = preparationTime),
-      recipe!.save();
+      (recipe!.servings = servings);
+    recipe!.save();
 
     res.status(200).json({ message: "Recipe updated", recipe: recipe });
   } catch (error) {
@@ -172,7 +176,7 @@ export const getRecipesFromUser = async (req: Request, res: Response, next: Next
       const error = new CustomError("No recipes found from this user", 422);
       throw error;
     }
-    res.status(200).json({ message: "Feteched recipes successfully", recipes: recipes });
+    res.status(200).json({ message: "Fetched recipes successfully", recipes: recipes });
   } catch (error) {
     next(error);
   }

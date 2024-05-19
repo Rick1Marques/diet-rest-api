@@ -10,6 +10,16 @@ router.get("/shopping-lists", isAuth, shoppingListControllers.getShoppingLists);
 
 router.get("/shopping-lists/:shoppingListId", isAuth, shoppingListControllers.getShoppingList);
 
-router.delete("/shopping-list/:shoppingListId", isAuth, shoppingListControllers.deleteShoppingList);
+router.delete(
+  "/shopping-lists/:shoppingListId",
+  isAuth,
+  shoppingListControllers.deleteShoppingList
+);
+
+router.patch(
+  "/shopping-lists/:shoppingListId/:recipeId",
+  isAuth,
+  shoppingListControllers.patchRecipeIntoShoppingList
+);
 
 export default router;

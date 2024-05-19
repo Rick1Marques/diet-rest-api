@@ -17,7 +17,7 @@ const recipe_1 = __importDefault(require("../models/recipe"));
 const error_handling_1 = require("../util/error-handling");
 const postRecipe = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const { title, category, ingredients, vegetarian, vegan, nutritionPerServing, instructions, preparationTime, } = req.body;
+        const { title, category, ingredients, vegetarian, vegan, nutritionPerServing, instructions, preparationTime, servings, } = req.body;
         let recipe = yield recipe_1.default.findOne({ title: title });
         if ((recipe === null || recipe === void 0 ? void 0 : recipe.userId.toString()) === req.userId) {
             const error = new error_handling_1.CustomError("User has already a recipe with this title", 422);
@@ -32,6 +32,7 @@ const postRecipe = (req, res, next) => __awaiter(void 0, void 0, void 0, functio
             nutritionPerServing: nutritionPerServing,
             instructions: instructions,
             preparationTime: preparationTime,
+            servings: servings,
             userId: req.userId,
         });
         yield recipe.save();
@@ -87,7 +88,7 @@ const getRecipes = (req, res, next) => __awaiter(void 0, void 0, void 0, functio
             const error = new error_handling_1.CustomError("No recipes found", 422);
             throw error;
         }
-        res.status(200).json({ message: "Feteched recipes successfully", recipes: recipes });
+        res.status(200).json({ message: "Fetched recipes successfully", recipes: recipes });
     }
     catch (error) {
         next(error);
@@ -102,7 +103,7 @@ const getRecipe = (req, res, next) => __awaiter(void 0, void 0, void 0, function
             const error = new error_handling_1.CustomError("No recipe found", 422);
             throw error;
         }
-        res.status(200).json({ message: "Feteched recipe successfully", recipe: recipe });
+        res.status(200).json({ message: "Fetched recipe successfully", recipe: recipe });
     }
     catch (error) {
         next(error);
@@ -111,7 +112,7 @@ const getRecipe = (req, res, next) => __awaiter(void 0, void 0, void 0, function
 exports.getRecipe = getRecipe;
 const putRecipe = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const { title, category, ingredients, vegetarian, vegan, nutritionPerServing, instructions, preparationTime, } = req.body;
+        const { title, category, ingredients, vegetarian, vegan, nutritionPerServing, instructions, preparationTime, servings, } = req.body;
         const recipeId = req.params.recipeId;
         let recipe = yield recipe_1.default.findById(recipeId);
         if ((recipe === null || recipe === void 0 ? void 0 : recipe.userId.toString()) !== req.userId) {
@@ -126,7 +127,8 @@ const putRecipe = (req, res, next) => __awaiter(void 0, void 0, void 0, function
             (recipe.nutritionPerServing = nutritionPerServing),
             (recipe.instructions = instructions),
             (recipe.preparationTime = preparationTime),
-            recipe.save();
+            (recipe.servings = servings);
+        recipe.save();
         res.status(200).json({ message: "Recipe updated", recipe: recipe });
     }
     catch (error) {
@@ -158,7 +160,7 @@ const getRecipesFromUser = (req, res, next) => __awaiter(void 0, void 0, void 0,
             const error = new error_handling_1.CustomError("No recipes found from this user", 422);
             throw error;
         }
-        res.status(200).json({ message: "Feteched recipes successfully", recipes: recipes });
+        res.status(200).json({ message: "Fetched recipes successfully", recipes: recipes });
     }
     catch (error) {
         next(error);
